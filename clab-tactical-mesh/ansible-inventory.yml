@@ -1,0 +1,25 @@
+all:
+  vars:
+    # The generated inventory is assumed to be used from the clab host.
+    # Hence no http proxy should be used. Therefore we make sure the http
+    # module does not attempt using any global http proxy.
+    ansible_httpapi_use_proxy: false
+  children:
+    linux:
+      hosts:
+        clab-tactical-mesh-nodeA:
+          ansible_host: 172.20.20.7
+        clab-tactical-mesh-nodeB:
+          ansible_host: 172.20.20.6
+        clab-tactical-mesh-nodeC:
+          ansible_host: 172.20.20.3
+        clab-tactical-mesh-nodeD:
+          ansible_host: 172.20.20.5
+        clab-tactical-mesh-nodeE:
+          ansible_host: 172.20.20.2
+        clab-tactical-mesh-wan5G:
+          ansible_host: 172.20.20.4
+        clab-tactical-mesh-wanRAD:
+          ansible_host: 172.20.20.8
+        clab-tactical-mesh-wanSAT:
+          ansible_host: 172.20.20.9

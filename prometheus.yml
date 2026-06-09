@@ -1,0 +1,41 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'node_exporter'
+    static_configs:
+      - targets:
+        - 172.20.20.7:9100   # nodeA
+        - 172.20.20.6:9100   # nodeB
+        - 172.20.20.3:9100   # nodeC
+        - 172.20.20.5:9100   # nodeD
+        - 172.20.20.2:9100   # nodeE
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: '(.*):\d+'
+        target_label: instance
+        replacement: '$1'
+
+  - job_name: 'snmp'
+    metrics_path: /snmp
+    params:
+      module: [if_mib]
+    static_configs:
+      - targets:
+        - 172.20.20.7   # nodeA
+        - 172.20.20.6   # nodeB
+        - 172.20.20.3   # nodeC
+        - 172.20.20.5   # nodeD
+        - 172.20.20.2   # nodeE
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: localhost:9116
+
+  - job_name: 'pmacct_netflow'
+    static_configs:
+      - targets: ['localhost:9101']

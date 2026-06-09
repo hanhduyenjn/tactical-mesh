@@ -1,0 +1,65 @@
+name: tactical-mesh
+
+topology:
+  nodes:
+    nodeA:
+      kind: linux
+      image: frrouting/frr:v8.4.1
+      binds:
+        - configs/nodeA/frr.conf:/etc/frr/frr.conf
+        - configs/nodeA/daemons:/etc/frr/daemons
+    nodeB:
+      kind: linux
+      image: frrouting/frr:v8.4.1
+      binds:
+        - configs/nodeB/frr.conf:/etc/frr/frr.conf
+        - configs/nodeB/daemons:/etc/frr/daemons
+    nodeC:
+      kind: linux
+      image: frrouting/frr:v8.4.1
+      binds:
+        - configs/nodeC/frr.conf:/etc/frr/frr.conf
+        - configs/nodeC/daemons:/etc/frr/daemons
+    nodeD:
+      kind: linux
+      image: frrouting/frr:v8.4.1
+      binds:
+        - configs/nodeD/frr.conf:/etc/frr/frr.conf
+        - configs/nodeD/daemons:/etc/frr/daemons
+    nodeE:
+      kind: linux
+      image: frrouting/frr:v8.4.1
+      binds:
+        - configs/nodeE/frr.conf:/etc/frr/frr.conf
+        - configs/nodeE/daemons:/etc/frr/daemons
+
+    # WAN uplink peers (eBGP) — represent SATCOM/Radio/5G provider edges
+    wanSAT:
+      kind: linux
+      image: frrouting/frr:v8.4.1
+      binds:
+        - configs/wanSAT/frr.conf:/etc/frr/frr.conf
+        - configs/wanSAT/daemons:/etc/frr/daemons
+    wanRAD:
+      kind: linux
+      image: frrouting/frr:v8.4.1
+      binds:
+        - configs/wanRAD/frr.conf:/etc/frr/frr.conf
+        - configs/wanRAD/daemons:/etc/frr/daemons
+    wan5G:
+      kind: linux
+      image: frrouting/frr:v8.4.1
+      binds:
+        - configs/wan5G/frr.conf:/etc/frr/frr.conf
+        - configs/wan5G/daemons:/etc/frr/daemons
+
+  links:
+    - endpoints: ["nodeA:eth1", "nodeB:eth1"]   # 5G (mesh)
+    - endpoints: ["nodeA:eth2", "nodeC:eth1"]   # SATCOM (mesh)
+    - endpoints: ["nodeA:eth3", "nodeE:eth1"]   # Radio (mesh)
+    - endpoints: ["nodeB:eth2", "nodeD:eth1"]   # Radio (mesh)
+    - endpoints: ["nodeC:eth2", "nodeD:eth2"]   # 5G (mesh)
+    - endpoints: ["nodeD:eth3", "nodeE:eth2"]   # Radio (mesh)
+    - endpoints: ["nodeA:eth4", "wanSAT:eth1"]  # SATCOM WAN uplink (eBGP AS 65001)
+    - endpoints: ["nodeA:eth5", "wanRAD:eth1"]  # Radio WAN uplink  (eBGP AS 65002)
+    - endpoints: ["nodeA:eth6", "wan5G:eth1"]   # 5G WAN uplink     (eBGP AS 65003)
