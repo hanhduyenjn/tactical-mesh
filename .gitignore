@@ -1,0 +1,28 @@
+# Documentation (local reference only)
+docs/
+
+# Containerlab runtime state
+clab-tactical-mesh/
+
+# Windows alternate data streams
+*.Zone.Identifier
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Docker build cache
+classifier/.dockerignore
+softflowd/.dockerignore
+pmacct/.dockerignore
+
+# Secrets / local overrides
+.env
+*.env.local
+
+# OS
+.DS_Store
+Thumbs.db

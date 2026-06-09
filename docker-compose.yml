@@ -10,6 +10,7 @@ services:
       - --config.file=/etc/prometheus/prometheus.yml
       - --storage.tsdb.path=/prometheus
       - --web.listen-address=:9090
+      - --web.enable-lifecycle
     restart: unless-stopped
 
   grafana:
@@ -37,6 +38,91 @@ services:
     network_mode: host
     restart: unless-stopped
 
+  classifier:
+    build: ./classifier
+    container_name: nms-classifier
+    network_mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - PROMETHEUS_URL=http://localhost:9090
+      - MQTT_HOST=localhost
+      - MQTT_PORT=1883
+      - METRICS_PORT=9102
+      - INTERVAL=10
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+      - mosquitto
+
+  # ── NetFlow pipeline ──────────────────────────────────────────────────────
+  # pmacct/nfacctd: collects NetFlow v9 from softflowd sidecars on UDP 9995
+  nfacctd:
+    image: pmacct/nfacctd:latest
+    container_name: nfacctd
+    network_mode: host
+    volumes:
+      - ./pmacct/nfacctd.conf:/etc/pmacct/nfacctd.conf:ro
+      - flows_data:/tmp
+    restart: unless-stopped
+
+  # flow_exporter: reads pmacct JSON output, serves Prometheus metrics on :9101
+  flow_exporter:
+    build: ./pmacct
+    container_name: flow-exporter
+    network_mode: host
+    volumes:
+      - flows_data:/tmp
+    environment:
+      - FLOWS_FILE=/tmp/flows.json
+      - METRICS_PORT=9101
+      - INTERVAL=30
+    restart: unless-stopped
+    depends_on:
+      - nfacctd
+
+  # softflowd sidecars — one per mesh node, share node network namespace
+  softflowd-nodeA:
+    image: tactical-softflowd
+    container_name: softflowd-nodeA
+    network_mode: "container:clab-tactical-mesh-nodeA"
+    cap_add: [NET_ADMIN]
+    command: ["-i", "eth1", "-n", "172.20.20.1:9995", "-v", "9", "-t", "maxlife=60", "-T", "full", "-d"]
+    restart: unless-stopped
+
+  softflowd-nodeB:
+    image: tactical-softflowd
+    container_name: softflowd-nodeB
+    network_mode: "container:clab-tactical-mesh-nodeB"
+    cap_add: [NET_ADMIN]
+    command: ["-i", "eth1", "-n", "172.20.20.1:9995", "-v", "9", "-t", "maxlife=60", "-T", "full", "-d"]
+    restart: unless-stopped
+
+  softflowd-nodeC:
+    image: tactical-softflowd
+    container_name: softflowd-nodeC
+    network_mode: "container:clab-tactical-mesh-nodeC"
+    cap_add: [NET_ADMIN]
+    command: ["-i", "eth1", "-n", "172.20.20.1:9995", "-v", "9", "-t", "maxlife=60", "-T", "full", "-d"]
+    restart: unless-stopped
+
+  softflowd-nodeD:
+    image: tactical-softflowd
+    container_name: softflowd-nodeD
+    network_mode: "container:clab-tactical-mesh-nodeD"
+    cap_add: [NET_ADMIN]
+    command: ["-i", "eth1", "-n", "172.20.20.1:9995", "-v", "9", "-t", "maxlife=60", "-T", "full", "-d"]
+    restart: unless-stopped
+
+  softflowd-nodeE:
+    image: tactical-softflowd
+    container_name: softflowd-nodeE
+    network_mode: "container:clab-tactical-mesh-nodeE"
+    cap_add: [NET_ADMIN]
+    command: ["-i", "eth1", "-n", "172.20.20.1:9995", "-v", "9", "-t", "maxlife=60", "-T", "full", "-d"]
+    restart: unless-stopped
+
 volumes:
   prometheus_data:
   grafana_data:
+  flows_data:

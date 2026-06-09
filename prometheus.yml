@@ -39,3 +39,7 @@ scrape_configs:
   - job_name: 'pmacct_netflow'
     static_configs:
       - targets: ['localhost:9101']
+
+  - job_name: 'nms_classifier'
+    static_configs:
+      - targets: ['localhost:9102']
