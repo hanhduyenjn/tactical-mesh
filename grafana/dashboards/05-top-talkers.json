@@ -1,0 +1,87 @@
+{
+  "id": null,
+  "uid": "c50a89ca-5c6a-4fcd-b901-a13af167be45",
+  "title": "5 — Top Talkers",
+  "tags": ["tactical-mesh"],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "version": 2,
+  "panels": [
+    {
+      "type": "row",
+      "id": 100,
+      "title": "NetFlow (per-flow attribution)",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "collapsed": false
+    },
+    {
+      "type": "bargauge",
+      "id": 10,
+      "title": "Top Talkers by Source IP (bytes, last 30s window) — NetFlow",
+      "description": "From netflow_bytes. Deduped with max(...) without(exporter) so a flow seen by the probes at both ends of a link is counted once. Independent of which management IP each node got.",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 1 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": 0 },
+              { "color": "orange", "value": 100000 },
+              { "color": "red", "value": 500000 }
+            ]
+          }
+        }
+      },
+      "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "reduceOptions": { "calcs": ["lastNotNull"] }
+      },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "topk(10, sum by(src) (max without(exporter) (netflow_bytes)))",
+          "legendFormat": "{{src}}"
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "id": 11,
+      "title": "Top Flows (src -> dst, proto/port) — NetFlow",
+      "description": "Per-conversation byte counts for the last 30s window. Deduped across exporters. Find the Scenario 3 overload flow here (dst_port 5201 = iperf3).",
+      "gridPos": { "h": 10, "w": 16, "x": 0, "y": 11 },
+      "fieldConfig": { "defaults": { "unit": "bytes" } },
+      "options": { "showHeader": true },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "topk(15, max without(exporter) (netflow_bytes))",
+          "format": "table",
+          "instant": true,
+          "legendFormat": ""
+        }
+      ]
+    },
+    {
+      "type": "piechart",
+      "id": 12,
+      "title": "Bytes by Protocol — NetFlow",
+      "description": "Share of traffic by protocol (ospf, udp/bfd, tcp, icmp). Deduped across exporters.",
+      "gridPos": { "h": 10, "w": 8, "x": 16, "y": 11 },
+      "fieldConfig": { "defaults": { "unit": "bytes" } },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "legend": { "displayMode": "table", "placement": "right", "values": ["value"] }
+      },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "sum by(proto) (max without(exporter) (netflow_bytes))",
+          "legendFormat": "{{proto}}"
+        }
+      ]
+    }
+  ]
+}

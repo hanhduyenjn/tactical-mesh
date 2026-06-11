@@ -446,15 +446,25 @@ scenario3() {
 
     # ── Step 7: NetFlow top-talkers ───────────────────────────────────────────
     step "Step 7 — NetFlow top-talkers identifies iperf3 as dominant flow"
-    info "Expected: netflow_top_src_bytes shows 10.2.0.1 (nodeA) with highest byte count"
-    sleep 35  # wait for next pmacct refresh
-    top_src=$(curl -sf "http://localhost:9101/metrics" 2>/dev/null \
-              | grep "netflow_top_src_bytes" | sort -t= -k2 -rn | head -3)
+    info "Expected: deduped top-talker query ranks 10.2.0.1 (nodeA) highest by bytes"
+    sleep 35  # wait for next pmacct refresh + Prometheus scrape
+    # Dedup across exporters (both link ends report the flow) and rank by source.
+    top_q='topk(3, sum by(src) (max without(exporter) (netflow_bytes)))'
+    top_src=$(curl -sfG "http://localhost:9090/api/v1/query" \
+                --data-urlencode "query=${top_q}" 2>/dev/null \
+              | python3 -c 'import sys,json
+r=json.load(sys.stdin).get("data",{}).get("result",[])
+for s in r: print(s["metric"].get("src","?"), int(float(s["value"][1])))' 2>/dev/null)
     if [[ -n "$top_src" ]]; then
-        pass "NetFlow top-talkers metrics present"
-        info "Top sources by bytes:\n$top_src"
+        pass "NetFlow top-talkers query returns data"
+        info "Top sources by bytes (deduped):\n$top_src"
+        if echo "$top_src" | head -1 | grep -q "10.2.0.1"; then
+            pass "nodeA (10.2.0.1) is the top talker — iperf3 overload attributed"
+        else
+            info "Top talker is not 10.2.0.1 — check overload flow is running"
+        fi
     else
-        fail "NetFlow top_src_bytes metric not present"
+        fail "NetFlow netflow_bytes metric not present in Prometheus"
     fi
 
     # Cleanup

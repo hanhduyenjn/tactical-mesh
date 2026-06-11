@@ -20,7 +20,7 @@ METRICS_PORT    = int(os.getenv("METRICS_PORT","9102"))
 INTERVAL        = int(os.getenv("INTERVAL",    "10"))   # seconds
 
 # Links: (link_id, node_a_instance, node_b_instance, iface_on_a, iface_on_b)
-# Instances match what Prometheus labels as "instance" from node_exporter
+# Instances match what Prometheus labels as "instance" from the snmp job
 LINKS = [
     ("A-B", "172.20.20.7", "172.20.20.6", "eth1", "eth1"),  # 5G
     ("A-C", "172.20.20.7", "172.20.20.3", "eth2", "eth1"),  # SATCOM
@@ -101,33 +101,32 @@ def probe_rtt_ms(container, peer_ip):
 
 def tx_drop_rate(instance, iface, window="10s"):
     v = prom_query_one(
-        f'rate(node_network_transmit_drop_total{{instance="{instance}",device="{iface}"}}[{window}])'
+        f'rate(ifOutDiscards{{instance="{instance}",ifName="{iface}",job="snmp"}}[{window}])'
     )
     return v or 0.0
 
 def rx_error_rate(instance, iface, window="10s"):
     v = prom_query_one(
-        f'rate(node_network_receive_errs_total{{instance="{instance}",device="{iface}"}}[{window}])'
-        f' + rate(node_network_receive_drop_total{{instance="{instance}",device="{iface}"}}[{window}])'
+        f'rate(ifInErrors{{instance="{instance}",ifName="{iface}",job="snmp"}}[{window}])'
+        f' + rate(ifInDiscards{{instance="{instance}",ifName="{iface}",job="snmp"}}[{window}])'
     )
     return v or 0.0
 
 def iface_up(instance, iface):
+    # ifOperStatus is a state-set: value=1 means that state is active.
     v = prom_query_one(
-        f'node_network_up{{instance="{instance}",device="{iface}"}}'
+        f'ifOperStatus{{instance="{instance}",ifName="{iface}",ifOperStatus="up",job="snmp"}}'
     )
     return bool(v) if v is not None else True   # assume up if no data
 
 def queue_depth_trend(instance, iface, window="30s"):
-    """Positive = rising queue, negative = draining, 0 = stable."""
-    now = prom_query_one(
-        f'node_network_transmit_queue_length{{instance="{instance}",device="{iface}"}}'
-    )
-    if now is None:
-        return 0.0
-    # rate of change over window
+    """Positive = rising queue overflow, 0 = stable.
+    IF-MIB has no queue-length counter; ifOutDiscards rate is the proxy —
+    discards only occur when the TX queue is full, so a rising discard rate
+    is the observable consequence of a growing queue.
+    """
     delta = prom_query_one(
-        f'deriv(node_network_transmit_queue_length{{instance="{instance}",device="{iface}"}}[{window}])'
+        f'deriv(ifOutDiscards{{instance="{instance}",ifName="{iface}",job="snmp"}}[{window}])'
     )
     return delta or 0.0
 

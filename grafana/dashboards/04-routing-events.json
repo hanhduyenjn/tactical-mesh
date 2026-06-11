@@ -1,0 +1,75 @@
+{
+  "id": null,
+  "panels": [
+    {
+      "gridPos": { "h": 7, "w": 24, "x": 0, "y": 0 },
+      "id": 1,
+      "description": "Number of times ifLastChange updated per minute — each update means the interface changed oper state. A spike here is the SNMP DISRUPTION signal.",
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "changes(ifLastChange{job=\"snmp\",ifName=~\"eth[1-6]\"}[1m])",
+          "legendFormat": "{{instance}} {{ifName}}"
+        }
+      ],
+      "title": "Interface State Changes (flaps/min — SNMP ifLastChange, OSPF reconvergence trigger)",
+      "type": "timeseries"
+    },
+    {
+      "gridPos": { "h": 7, "w": 12, "x": 0, "y": 7 },
+      "id": 2,
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "ifOperStatus{job=\"snmp\",ifOperStatus=\"up\",ifName=~\"eth[1-6]\"}",
+          "legendFormat": "{{instance}} {{ifName}}"
+        }
+      ],
+      "title": "Link Oper Status (1=up 0=absent) — OSPF neighbour goes FULL when 1",
+      "type": "timeseries"
+    },
+    {
+      "gridPos": { "h": 7, "w": 12, "x": 12, "y": 7 },
+      "id": 3,
+      "fieldConfig": { "defaults": { "unit": "bps" } },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(ifHCOutOctets{job=\"snmp\",instance=\"172.20.20.7\",ifName=\"eth4\"}[1m]) * 8",
+          "legendFormat": "WAN-SATCOM (eth4)"
+        },
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(ifHCOutOctets{job=\"snmp\",instance=\"172.20.20.7\",ifName=\"eth5\"}[1m]) * 8",
+          "legendFormat": "WAN-Radio (eth5)"
+        },
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(ifHCOutOctets{job=\"snmp\",instance=\"172.20.20.7\",ifName=\"eth6\"}[1m]) * 8",
+          "legendFormat": "WAN-5G (eth6)"
+        }
+      ],
+      "title": "BGP WAN link TX rate (bits/s) — drops to 0 on BGP failover",
+      "type": "timeseries"
+    },
+    {
+      "description": "During OSPF reconvergence, all nodes flood LSAs simultaneously. A coordinated TX spike across all links indicates an OSPF event, not a congestion event.",
+      "gridPos": { "h": 7, "w": 24, "x": 0, "y": 14 },
+      "id": 4,
+      "fieldConfig": { "defaults": { "unit": "bps" } },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(ifHCOutOctets{job=\"snmp\",ifName=~\"eth[1-6]\"}[10s]) * 8",
+          "legendFormat": "{{instance}} {{ifName}}"
+        }
+      ],
+      "title": "OSPF Reconvergence Proxy — TX rate spike on Radio links (LSA flood)",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "10s",
+  "tags": ["tactical-mesh"],
+  "title": "4 — Routing Events",
+  "uid": "ef1a44c6-b6b9-4e96-80bb-d409126d2bd1"
+}

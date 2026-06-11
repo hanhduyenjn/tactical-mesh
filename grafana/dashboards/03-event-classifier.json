@@ -1,0 +1,147 @@
+{
+  "id": null,
+  "panels": [
+    {
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "fillOpacity": 10,
+            "lineWidth": 2
+          },
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "text": "NORMAL"
+                },
+                "1": {
+                  "text": "DISRUPTION"
+                },
+                "2": {
+                  "text": "CONGESTION"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "max": 2,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "orange",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 2
+              }
+            ]
+          }
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "mesh_link_classifier_state",
+          "legendFormat": "{{link}}"
+        }
+      ],
+      "title": "Classifier State per Link (0=NORMAL 1=DISRUPTION 2=CONGESTION)",
+      "type": "timeseries"
+    },
+    {
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "id": 2,
+      "fieldConfig": { "defaults": { "unit": "pps" } },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(ifOutDiscards{job=\"snmp\",ifName=~\"eth[1-6]\"}[10s])",
+          "legendFormat": "{{instance}} {{ifName}}"
+        }
+      ],
+      "title": "TX Discard Rate per Link (drops/s)",
+      "type": "timeseries"
+    },
+    {
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "id": 3,
+      "fieldConfig": { "defaults": { "unit": "pps" } },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(ifInErrors{job=\"snmp\",ifName=~\"eth[1-6]\"}[10s])+rate(ifInDiscards{job=\"snmp\",ifName=~\"eth[1-6]\"}[10s])",
+          "legendFormat": "{{instance}} {{ifName}}"
+        }
+      ],
+      "title": "RX Error Rate per Link (errors/s)",
+      "type": "timeseries"
+    },
+    {
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 15
+      },
+      "id": 4,
+      "description": "deriv of ifOutDiscards — proxy for queue buildup (IF-MIB has no queue-depth counter).",
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "deriv(ifOutDiscards{job=\"snmp\",ifName=~\"eth[1-6]\"}[30s])",
+          "legendFormat": "{{instance}} {{ifName}}"
+        }
+      ],
+      "title": "TX Discard Trend — queue overflow proxy (rising = congestion building)",
+      "type": "timeseries"
+    },
+    {
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 15
+      },
+      "id": 5,
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "ifOperStatus{job=\"snmp\",ifOperStatus=\"up\",ifName=~\"eth[1-6]\"}",
+          "legendFormat": "{{instance}} {{ifName}}"
+        }
+      ],
+      "title": "Interface Up/Down State (1=up 0=absent)",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "10s",
+  "tags": [
+    "tactical-mesh"
+  ],
+  "title": "3 — Event Classifier",
+  "uid": "f9701edd-2249-4725-9c96-fd5e87a05972"
+}

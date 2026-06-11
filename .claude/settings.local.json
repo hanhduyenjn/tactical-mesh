@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wsl -d Ubuntu-26.04 -- bash -lc \"docker exec nfacctd sh -c 'head -3 /tmp/flows.json' 2>/dev/null | python3 -m json.tool 2>/dev/null | head -40; echo '--- a few one-liners ---'; docker exec nfacctd sh -c 'cat /tmp/flows.json' 2>/dev/null | grep -E '10.2.0' | head -5\")"
+    ]
+  }
+}

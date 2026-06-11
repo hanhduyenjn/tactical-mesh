@@ -22,6 +22,8 @@ services:
       - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
       - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
     restart: unless-stopped
 
   mosquitto:
@@ -36,6 +38,11 @@ services:
     image: prom/snmp-exporter:v0.25.0
     container_name: snmp_exporter
     network_mode: host
+    volumes:
+      - ./snmp_exporter/snmp.yml:/etc/snmp_exporter/snmp.yml:ro
+    command:
+      - --config.file=/etc/snmp_exporter/snmp.yml
+      - --web.listen-address=:9116
     restart: unless-stopped
 
   classifier:
@@ -87,7 +94,7 @@ services:
     container_name: softflowd-nodeA
     network_mode: "container:clab-tactical-mesh-nodeA"
     cap_add: [NET_ADMIN]
-    command: ["-i", "eth1", "-n", "172.20.20.1:9995", "-v", "9", "-t", "maxlife=60", "-T", "full", "-d"]
+    command: ["-i", "any", "-n", "172.20.20.1:9995", "-v", "9", "-t", "maxlife=60", "-T", "full", "-d", "not net 172.20.20.0/24"]
     restart: unless-stopped
 
   softflowd-nodeB:
@@ -95,7 +102,7 @@ services:
     container_name: softflowd-nodeB
     network_mode: "container:clab-tactical-mesh-nodeB"
     cap_add: [NET_ADMIN]
-    command: ["-i", "eth1", "-n", "172.20.20.1:9995", "-v", "9", "-t", "maxlife=60", "-T", "full", "-d"]
+    command: ["-i", "any", "-n", "172.20.20.1:9995", "-v", "9", "-t", "maxlife=60", "-T", "full", "-d", "not net 172.20.20.0/24"]
     restart: unless-stopped
 
   softflowd-nodeC:
@@ -103,7 +110,7 @@ services:
     container_name: softflowd-nodeC
     network_mode: "container:clab-tactical-mesh-nodeC"
     cap_add: [NET_ADMIN]
-    command: ["-i", "eth1", "-n", "172.20.20.1:9995", "-v", "9", "-t", "maxlife=60", "-T", "full", "-d"]
+    command: ["-i", "any", "-n", "172.20.20.1:9995", "-v", "9", "-t", "maxlife=60", "-T", "full", "-d", "not net 172.20.20.0/24"]
     restart: unless-stopped
 
   softflowd-nodeD:
@@ -111,7 +118,7 @@ services:
     container_name: softflowd-nodeD
     network_mode: "container:clab-tactical-mesh-nodeD"
     cap_add: [NET_ADMIN]
-    command: ["-i", "eth1", "-n", "172.20.20.1:9995", "-v", "9", "-t", "maxlife=60", "-T", "full", "-d"]
+    command: ["-i", "any", "-n", "172.20.20.1:9995", "-v", "9", "-t", "maxlife=60", "-T", "full", "-d", "not net 172.20.20.0/24"]
     restart: unless-stopped
 
   softflowd-nodeE:
@@ -119,7 +126,47 @@ services:
     container_name: softflowd-nodeE
     network_mode: "container:clab-tactical-mesh-nodeE"
     cap_add: [NET_ADMIN]
-    command: ["-i", "eth1", "-n", "172.20.20.1:9995", "-v", "9", "-t", "maxlife=60", "-T", "full", "-d"]
+    command: ["-i", "any", "-n", "172.20.20.1:9995", "-v", "9", "-t", "maxlife=60", "-T", "full", "-d", "not net 172.20.20.0/24"]
+    restart: unless-stopped
+
+  # ── SNMP agents ───────────────────────────────────────────────────────────
+  # snmpd sidecars — one per mesh node, share the node network namespace so the
+  # agent answers on the node's mgmt IP (172.20.20.x:161). Exposes IF-MIB only;
+  # scraped by snmp_exporter (:9116) → Prometheus snmp job. Same pattern as the
+  # softflowd sidecars above.
+  snmpd-nodeA:
+    image: tactical-snmpd
+    build: ./snmpd
+    container_name: snmpd-nodeA
+    network_mode: "container:clab-tactical-mesh-nodeA"
+    restart: unless-stopped
+
+  snmpd-nodeB:
+    image: tactical-snmpd
+    build: ./snmpd
+    container_name: snmpd-nodeB
+    network_mode: "container:clab-tactical-mesh-nodeB"
+    restart: unless-stopped
+
+  snmpd-nodeC:
+    image: tactical-snmpd
+    build: ./snmpd
+    container_name: snmpd-nodeC
+    network_mode: "container:clab-tactical-mesh-nodeC"
+    restart: unless-stopped
+
+  snmpd-nodeD:
+    image: tactical-snmpd
+    build: ./snmpd
+    container_name: snmpd-nodeD
+    network_mode: "container:clab-tactical-mesh-nodeD"
+    restart: unless-stopped
+
+  snmpd-nodeE:
+    image: tactical-snmpd
+    build: ./snmpd
+    container_name: snmpd-nodeE
+    network_mode: "container:clab-tactical-mesh-nodeE"
     restart: unless-stopped
 
 volumes:

@@ -1,0 +1,140 @@
+{
+  "id": null,
+  "panels": [
+    {
+      "gridPos": { "h": 6, "w": 24, "x": 0, "y": 0 },
+      "id": 1,
+      "description": "IF-MIB operational state per link (1 = up). SNMP owns interface-state in the classifier — a drop to 0 within the window signals DISRUPTION, not congestion.",
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } }
+          ],
+          "color": { "mode": "thresholds" },
+          "thresholds": { "steps": [ { "color": "red", "value": null }, { "color": "green", "value": 1 } ] }
+        }
+      },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "ifOperStatus{ifOperStatus=\"up\",ifName=~\"eth[1-6]\"}",
+          "legendFormat": "{{instance}} {{ifName}}"
+        }
+      ],
+      "title": "Interface Oper Status — all links (SNMP ifOperStatus, 1=up)",
+      "type": "state-timeline"
+    },
+    {
+      "gridPos": { "h": 7, "w": 12, "x": 0, "y": 6 },
+      "id": 2,
+      "description": "RX throughput from SNMP 64-bit counters (bits/s).",
+      "fieldConfig": { "defaults": { "unit": "bps" } },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(ifHCInOctets{ifName=~\"eth[1-6]\"}[1m]) * 8",
+          "legendFormat": "{{instance}} {{ifName}}"
+        }
+      ],
+      "title": "RX Throughput — all links (SNMP ifHCInOctets)",
+      "type": "timeseries"
+    },
+    {
+      "gridPos": { "h": 7, "w": 12, "x": 12, "y": 6 },
+      "id": 3,
+      "description": "TX throughput from SNMP 64-bit counters (bits/s).",
+      "fieldConfig": { "defaults": { "unit": "bps" } },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(ifHCOutOctets{ifName=~\"eth[1-6]\"}[1m]) * 8",
+          "legendFormat": "{{instance}} {{ifName}}"
+        }
+      ],
+      "title": "TX Throughput — all links (SNMP ifHCOutOctets)",
+      "type": "timeseries"
+    },
+    {
+      "gridPos": { "h": 7, "w": 12, "x": 0, "y": 13 },
+      "id": 4,
+      "description": "Link utilisation against the EMULATED link caps (netem rate, not ifSpeed). SNMP ifSpeed/ifHighSpeed report the veth default (10 Gbps), NOT the tc/netem rate, so utilisation is computed against the known per-class caps: 5G 50 Mbps, SATCOM 1 Mbps, Radio 256 kbps. Edit the divisor per link if the topology changes. Sustained > 0.7 is a congestion precursor.",
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0 } },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "(rate(ifHCOutOctets{instance=\"172.20.20.7\",ifName=\"eth1\"}[1m]) * 8) / 50000000",
+          "legendFormat": "A-B 5G (50M)"
+        },
+        {
+          "datasource": "Prometheus",
+          "expr": "(rate(ifHCOutOctets{instance=\"172.20.20.7\",ifName=\"eth2\"}[1m]) * 8) / 1000000",
+          "legendFormat": "A-C SATCOM (1M)"
+        },
+        {
+          "datasource": "Prometheus",
+          "expr": "(rate(ifHCOutOctets{instance=\"172.20.20.7\",ifName=\"eth3\"}[1m]) * 8) / 256000",
+          "legendFormat": "A-E Radio (256k)"
+        }
+      ],
+      "title": "Link Utilisation — TX vs emulated cap (Node A WAN-class links)",
+      "type": "timeseries"
+    },
+    {
+      "gridPos": { "h": 7, "w": 12, "x": 12, "y": 13 },
+      "id": 5,
+      "description": "RX errors + discards per second (SNMP). This is the classifier's SNMP loss signal: a short burst then zero = DISRUPTION; gradual sustained rise = CONGESTION.",
+      "fieldConfig": { "defaults": { "unit": "pps" } },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(ifInErrors{ifName=~\"eth[1-6]\"}[1m]) + rate(ifInDiscards{ifName=~\"eth[1-6]\"}[1m])",
+          "legendFormat": "{{instance}} {{ifName}}"
+        }
+      ],
+      "title": "RX Errors + Discards — loss signal (SNMP)",
+      "type": "timeseries"
+    },
+    {
+      "gridPos": { "h": 7, "w": 12, "x": 0, "y": 20 },
+      "id": 6,
+      "description": "TX errors + discards per second (SNMP). Outbound discards typically indicate queue overflow under congestion on the sending side.",
+      "fieldConfig": { "defaults": { "unit": "pps" } },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(ifOutErrors{ifName=~\"eth[1-6]\"}[1m]) + rate(ifOutDiscards{ifName=~\"eth[1-6]\"}[1m])",
+          "legendFormat": "{{instance}} {{ifName}}"
+        }
+      ],
+      "title": "TX Errors + Discards — queue overflow signal (SNMP)",
+      "type": "timeseries"
+    },
+    {
+      "gridPos": { "h": 7, "w": 12, "x": 12, "y": 20 },
+      "id": 7,
+      "description": "Packet rate per link from SNMP unicast counters (packets/s), in + out.",
+      "fieldConfig": { "defaults": { "unit": "pps" } },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(ifHCInUcastPkts{ifName=~\"eth[1-6]\"}[1m])",
+          "legendFormat": "RX {{instance}} {{ifName}}"
+        },
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(ifHCOutUcastPkts{ifName=~\"eth[1-6]\"}[1m])",
+          "legendFormat": "TX {{instance}} {{ifName}}"
+        }
+      ],
+      "title": "Packet Rate — all links (SNMP ifHCUcastPkts)",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "15s",
+  "tags": [
+    "tactical-mesh",
+    "snmp"
+  ],
+  "title": "6 — SNMP Interface Metrics",
+  "uid": "snmp-if-metrics-0001"
+}

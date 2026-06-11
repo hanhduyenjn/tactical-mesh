@@ -1,0 +1,403 @@
+{
+  "id": null,
+  "panels": [
+    {
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "green",
+                  "text": "NORMAL"
+                },
+                "1": {
+                  "color": "orange",
+                  "text": "DISRUPTION"
+                },
+                "2": {
+                  "color": "red",
+                  "text": "CONGESTION"
+                }
+              },
+              "type": "value"
+            },
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "color": "blue",
+                  "text": "NO DATA"
+                }
+              },
+              "type": "special"
+            }
+          ]
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "colorMode": "background",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "mesh_link_classifier_state{link=\"A-B\"}",
+          "legendFormat": "A-B"
+        }
+      ],
+      "title": "Link A-B (5G)",
+      "type": "stat"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "green",
+                  "text": "NORMAL"
+                },
+                "1": {
+                  "color": "orange",
+                  "text": "DISRUPTION"
+                },
+                "2": {
+                  "color": "red",
+                  "text": "CONGESTION"
+                }
+              },
+              "type": "value"
+            },
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "color": "blue",
+                  "text": "NO DATA"
+                }
+              },
+              "type": "special"
+            }
+          ]
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "background",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "mesh_link_classifier_state{link=\"A-C\"}",
+          "legendFormat": "A-C"
+        }
+      ],
+      "title": "Link A-C (SATCOM)",
+      "type": "stat"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "green",
+                  "text": "NORMAL"
+                },
+                "1": {
+                  "color": "orange",
+                  "text": "DISRUPTION"
+                },
+                "2": {
+                  "color": "red",
+                  "text": "CONGESTION"
+                }
+              },
+              "type": "value"
+            },
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "color": "blue",
+                  "text": "NO DATA"
+                }
+              },
+              "type": "special"
+            }
+          ]
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 0
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "background",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "mesh_link_classifier_state{link=\"A-E\"}",
+          "legendFormat": "A-E"
+        }
+      ],
+      "title": "Link A-E (Radio)",
+      "type": "stat"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "green",
+                  "text": "NORMAL"
+                },
+                "1": {
+                  "color": "orange",
+                  "text": "DISRUPTION"
+                },
+                "2": {
+                  "color": "red",
+                  "text": "CONGESTION"
+                }
+              },
+              "type": "value"
+            },
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "color": "blue",
+                  "text": "NO DATA"
+                }
+              },
+              "type": "special"
+            }
+          ]
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "background",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "mesh_link_classifier_state{link=\"B-D\"}",
+          "legendFormat": "B-D"
+        }
+      ],
+      "title": "Link B-D (Radio)",
+      "type": "stat"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "green",
+                  "text": "NORMAL"
+                },
+                "1": {
+                  "color": "orange",
+                  "text": "DISRUPTION"
+                },
+                "2": {
+                  "color": "red",
+                  "text": "CONGESTION"
+                }
+              },
+              "type": "value"
+            },
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "color": "blue",
+                  "text": "NO DATA"
+                }
+              },
+              "type": "special"
+            }
+          ]
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 0
+      },
+      "id": 5,
+      "options": {
+        "colorMode": "background",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "mesh_link_classifier_state{link=\"C-D\"}",
+          "legendFormat": "C-D"
+        }
+      ],
+      "title": "Link C-D (5G)",
+      "type": "stat"
+    },
+    {
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "green",
+                  "text": "NORMAL"
+                },
+                "1": {
+                  "color": "orange",
+                  "text": "DISRUPTION"
+                },
+                "2": {
+                  "color": "red",
+                  "text": "CONGESTION"
+                }
+              },
+              "type": "value"
+            },
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "color": "blue",
+                  "text": "NO DATA"
+                }
+              },
+              "type": "special"
+            }
+          ]
+        }
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 0
+      },
+      "id": 6,
+      "options": {
+        "colorMode": "background",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "mesh_link_classifier_state{link=\"D-E\"}",
+          "legendFormat": "D-E"
+        }
+      ],
+      "title": "Link D-E (Radio)",
+      "type": "stat"
+    },
+    {
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 4
+      },
+      "id": 7,
+      "fieldConfig": { "defaults": { "unit": "s" } },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "sysUpTime{job=\"snmp\"} / 100",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "title": "Node Uptime (seconds, SNMP sysUpTime)",
+      "type": "timeseries"
+    },
+    {
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 4
+      },
+      "id": 8,
+      "fieldConfig": { "defaults": { "unit": "bps" } },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(ifHCOutOctets{job=\"snmp\",ifName=~\"eth[1-6]\"}[1m]) * 8",
+          "legendFormat": "{{instance}} {{ifName}}"
+        }
+      ],
+      "title": "Node Network TX Rate — mesh interfaces (bits/s)",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "10s",
+  "tags": [
+    "tactical-mesh"
+  ],
+  "title": "1 — Topology Overview",
+  "uid": "cb3a040d-77c2-44b4-8346-c932fc32ea9c"
+}

@@ -1,0 +1,108 @@
+{
+  "id": null,
+  "panels": [
+    {
+      "gridPos": { "h": 7, "w": 12, "x": 0, "y": 0 },
+      "id": 1,
+      "fieldConfig": { "defaults": { "unit": "bps" } },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(ifHCOutOctets{job=\"snmp\",instance=\"172.20.20.7\",ifName=\"eth1\"}[1m]) * 8",
+          "legendFormat": "A-B 5G"
+        },
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(ifHCOutOctets{job=\"snmp\",instance=\"172.20.20.3\",ifName=\"eth2\"}[1m]) * 8",
+          "legendFormat": "C-D 5G"
+        }
+      ],
+      "title": "TX Throughput — 5G links (bits/s)",
+      "type": "timeseries"
+    },
+    {
+      "gridPos": { "h": 7, "w": 12, "x": 12, "y": 0 },
+      "id": 2,
+      "fieldConfig": { "defaults": { "unit": "bps" } },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(ifHCOutOctets{job=\"snmp\",instance=\"172.20.20.7\",ifName=\"eth2\"}[1m]) * 8",
+          "legendFormat": "A-C SATCOM"
+        }
+      ],
+      "title": "TX Throughput — SATCOM link (bits/s)",
+      "type": "timeseries"
+    },
+    {
+      "gridPos": { "h": 7, "w": 12, "x": 0, "y": 7 },
+      "id": 3,
+      "fieldConfig": { "defaults": { "unit": "bps" } },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(ifHCOutOctets{job=\"snmp\",instance=\"172.20.20.7\",ifName=\"eth3\"}[1m]) * 8",
+          "legendFormat": "A-E Radio"
+        },
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(ifHCOutOctets{job=\"snmp\",instance=\"172.20.20.6\",ifName=\"eth2\"}[1m]) * 8",
+          "legendFormat": "B-D Radio"
+        },
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(ifHCOutOctets{job=\"snmp\",instance=\"172.20.20.5\",ifName=\"eth3\"}[1m]) * 8",
+          "legendFormat": "D-E Radio"
+        }
+      ],
+      "title": "TX Throughput — Radio links (bits/s)",
+      "type": "timeseries"
+    },
+    {
+      "gridPos": { "h": 7, "w": 12, "x": 12, "y": 7 },
+      "id": 4,
+      "fieldConfig": { "defaults": { "unit": "pps" } },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(ifOutDiscards{job=\"snmp\",ifName=~\"eth[1-6]\"}[1m])",
+          "legendFormat": "{{instance}} {{ifName}}"
+        }
+      ],
+      "title": "TX Discards — all links (drops/s, congestion indicator)",
+      "type": "timeseries"
+    },
+    {
+      "gridPos": { "h": 7, "w": 12, "x": 0, "y": 14 },
+      "id": 5,
+      "fieldConfig": { "defaults": { "unit": "pps" } },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(ifInErrors{job=\"snmp\",ifName=~\"eth[1-6]\"}[1m]) + rate(ifInDiscards{job=\"snmp\",ifName=~\"eth[1-6]\"}[1m])",
+          "legendFormat": "{{instance}} {{ifName}}"
+        }
+      ],
+      "title": "RX Errors + Discards — all links (disruption indicator)",
+      "type": "timeseries"
+    },
+    {
+      "gridPos": { "h": 7, "w": 12, "x": 12, "y": 14 },
+      "id": 6,
+      "description": "deriv of ifOutDiscards — rising = TX queue overflowing (congestion). IF-MIB has no queue-depth counter; discard rate growth is the observable proxy.",
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "deriv(ifOutDiscards{job=\"snmp\",ifName=~\"eth[1-6]\"}[30s])",
+          "legendFormat": "{{instance}} {{ifName}}"
+        }
+      ],
+      "title": "TX Discard Trend — all links (rising = congestion building)",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "15s",
+  "tags": ["tactical-mesh"],
+  "title": "2 — Per-Link Metrics",
+  "uid": "ed6b0bd8-1d59-428c-9d97-155a3d7cea5a"
+}

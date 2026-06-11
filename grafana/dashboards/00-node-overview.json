@@ -1,0 +1,93 @@
+{
+  "id": null,
+  "panels": [
+    {
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "id": 1,
+      "fieldConfig": { "defaults": { "unit": "pps" } },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "sum by (instance) (rate(ifHCOutUcastPkts{job=\"snmp\",ifName=~\"eth[1-6]\"}[1m]))",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "title": "TX Packet Rate per Node (pps, mesh interfaces)",
+      "type": "timeseries"
+    },
+    {
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "id": 2,
+      "fieldConfig": { "defaults": { "unit": "pps" } },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "sum by (instance) (rate(ifHCInUcastPkts{job=\"snmp\",ifName=~\"eth[1-6]\"}[1m]))",
+          "legendFormat": "{{instance}}"
+        }
+      ],
+      "title": "RX Packet Rate per Node (pps, mesh interfaces)",
+      "type": "timeseries"
+    },
+    {
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "id": 3,
+      "fieldConfig": { "defaults": { "unit": "bps" } },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(ifHCOutOctets{job=\"snmp\",ifName=~\"eth[1-6]\"}[1m]) * 8",
+          "legendFormat": "{{instance}} {{ifName}}"
+        }
+      ],
+      "title": "TX Throughput per Interface (bits/s)",
+      "type": "timeseries"
+    },
+    {
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "id": 4,
+      "fieldConfig": { "defaults": { "unit": "bps" } },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(ifHCInOctets{job=\"snmp\",ifName=~\"eth[1-6]\"}[1m]) * 8",
+          "legendFormat": "{{instance}} {{ifName}}"
+        }
+      ],
+      "title": "RX Throughput per Interface (bits/s)",
+      "type": "timeseries"
+    },
+    {
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+      "id": 5,
+      "fieldConfig": { "defaults": { "unit": "pps" } },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(ifOutDiscards{job=\"snmp\",ifName=~\"eth[1-6]\"}[1m])",
+          "legendFormat": "{{instance}} {{ifName}}"
+        }
+      ],
+      "title": "TX Discards per Interface (drops/s) — congestion indicator",
+      "type": "timeseries"
+    },
+    {
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "id": 6,
+      "fieldConfig": { "defaults": { "unit": "pps" } },
+      "targets": [
+        {
+          "datasource": "Prometheus",
+          "expr": "rate(ifInErrors{job=\"snmp\",ifName=~\"eth[1-6]\"}[1m]) + rate(ifInDiscards{job=\"snmp\",ifName=~\"eth[1-6]\"}[1m])",
+          "legendFormat": "{{instance}} {{ifName}}"
+        }
+      ],
+      "title": "RX Errors + Discards per Interface (errors/s)",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "15s",
+  "tags": ["tactical-mesh"],
+  "title": "Tactical Mesh — Node Overview",
+  "uid": "e425518a-8de0-426b-868c-7e3b08fe7644"
+}
